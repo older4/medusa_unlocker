@@ -33,7 +33,7 @@ def byte_entropy(binary):
     return entropy
 
 
-def search_aes_key(dump_path):
+def search_aes_key_wrapper(dump_path):
     cmd = "rsc/aeskeyfind_windows.exe {dump} -t 50".format(dump=dump_path)
     proc = subprocess.Popen(
         cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -45,6 +45,35 @@ def search_aes_key(dump_path):
 
         if not line and proc.poll() is not None:
             break
+
+
+def get_aes_key(dump_path, bit):
+    progress = 0
+    _128bitAESkeys = []
+    _256bitAESkeys = []
+
+    for output in search_aes_key_wrapper(dump_path):
+        if("progress" in output):
+            progress += 1
+            sys.stdout.write("\rProgress {:>3}%:".format(progress))
+        else:
+            sys.stdout.write("\r")
+            if(len(output) == 32):
+                print("128bit key: "+output)
+                _128bitAESkeys.append(output)
+            elif(len(output) == 64):
+                print("256bit key: "+output)
+                _256bitAESkeys.append(output)
+            else:
+                print(output)
+
+        sys.stdout.flush()
+
+    if(bit == 128):
+        return _128bitAESkeys
+
+    elif(bit == 256):
+        return _256bitAESkeys
 
 
 def get_medusa_dump():
@@ -66,39 +95,4 @@ def get_medusa_dump():
 
 
 if __name__ == "__main__":
-    original = r"D:\my_program\medusa_unlocker\sample\BGinfo_original\build.cfg"
-    encrypted = r"D:\my_program\medusa_unlocker\sample\BGinfo_encrypted2\build.cfg.encrypted"
-
-    with open(original, "rb") as f:
-        original_data = f.read()
-
-    with open(encrypted, "rb") as f:
-        encrypted_data = f.read()
-
-    print("original  entropy:{:<100}".format(byte_entropy(original_data)))
-    print("encrypted entropy:{:<100}".format(byte_entropy(encrypted_data)))
-
-    # dump_path = "memory.dmp"
-    # progress = 0
-    # gage = 0
-    # for stdout in search_aes_key(dump_path):
-    #     try:
-    #         output_str = stdout.strip().decode("utf-8")
-    #     except UnicodeDecodeError:
-    #         output_str = stdout.strip()
-
-    #     if("progress" in output_str):
-    #         progress += 1
-    #         sys.stdout.write("\rProgress {:>3}%:".format(progress))
-
-    #         if(round(progress/2) != gage):
-    #             gage = round(progress/2)
-
-    #         for i in range(gage):
-    #             sys.stdout.write("|")
-
-    #     else:
-    #         sys.stdout.write("\r")
-    #         print(output_str)
-
-    #     sys.stdout.flush()
+    pass
