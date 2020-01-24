@@ -1,4 +1,4 @@
-name: py36_medusa_unlock
+name: py36_medusa_unlock_64bit
 channels:
   - defaults
 dependencies:

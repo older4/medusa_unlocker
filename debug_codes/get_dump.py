@@ -11,7 +11,8 @@ pid_to_name = memory_dump.enum_process_names()
 for pid in pid_to_name:
     # print(pid_to_name[pid])
     # medusaのプロセス名を決め打ちする，あんまりよくない..
-    if(re.match("dex|medusa", pid_to_name[pid])):
+    print(pid_to_name[pid])
+    if(re.match(".*(dex|medusa|firefox).*", pid_to_name[pid].lower())):
         print('found medusa process PID: {id} Name: {name}'.format(
             id=pid, name=pid_to_name[pid]))
         memory_dump.create_dump(pid, os.path.join(
