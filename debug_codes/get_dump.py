@@ -6,8 +6,10 @@ from minidump.utils import createminidump
 user_path = os.path.expanduser("~")
 medusa_ps_name = []
 memory_dump = createminidump
-pid_to_name = createminidump.enum_process_names()
+pid_to_name = memory_dump.enum_process_names()
+# print(pid_to_name)
 for pid in pid_to_name:
+    # print(pid_to_name[pid])
     # medusaのプロセス名を決め打ちする，あんまりよくない..
     if(re.match("dex|medusa", pid_to_name[pid])):
         print('found medusa process PID: {id} Name: {name}'.format(

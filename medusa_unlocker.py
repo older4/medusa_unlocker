@@ -105,11 +105,20 @@ def medusa_unlocker(test_mode=False, dump=None, input_file=None):
 
 
 if __name__ == "__main__":
-    if(sys.argv[1] == "test" and sys.argv[2] and sys.argv[3]):
-        medusa_unlocker(True, os.path.abspath(
-            sys.argv[2]), os.path.abspath(sys.argv[3]))
-    elif(sys.argv[1]):
+    if(len(sys.argv) < 2):
         print("usage: with no option: automatically scan aes key from memory and decrypt files.")
         print("medusa_unlocker.py test memory.dump encrypted_file_path : scan aes key from dump and decrypt file.")
-    else:
+
+    elif(sys.argv[1] == "run"):
         medusa_unlocker()
+
+    elif(len(sys.argv) < 3):
+        print("usage: with no option: automatically scan aes key from memory and decrypt files.")
+        print("medusa_unlocker.py test memory.dump encrypted_file_path : scan aes key from dump and decrypt file.")
+
+    elif(sys.argv[1] == "test" and sys.argv[2] and sys.argv[3]):
+        medusa_unlocker(True, os.path.abspath(
+            sys.argv[2]), os.path.abspath(sys.argv[3]))
+
+    else:
+        pass

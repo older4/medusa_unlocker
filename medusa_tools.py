@@ -79,7 +79,7 @@ def get_aes_key(dump_path, bit):
 def get_medusa_dump():
     user_path = os.path.expanduser("~")
     memory_dump = createminidump
-    pid_to_name = createminidump.enum_process_names()
+    pid_to_name = memory_dump.enum_process_names()
     for pid in pid_to_name:
         # medusaのプロセス名を決め打ちする，あんまりよくない..
         if(re.match("dex|medusa", pid_to_name[pid])):
