@@ -19,7 +19,7 @@ def unlock(key, path):
         cipherdata = f.read()
 
     path_tmp = path.split(".")
-    decrypt_path = path_tmp[0]+"."+path_tmp[1]
+    decrypt_path = ".".join(path_tmp[:-1])
     print("decrypt: "+decrypt_path)
 
     datasize_b = cipherdata[-24:-16]
@@ -39,23 +39,28 @@ def unlock(key, path):
     return decrypt_path
 
 
-def medusa_unlocker(test_mode=False, dump=None, input_file=None):
+def medusa_unlocker(mode=False, dump=None, input_file=None,key = None):
     # encrypted filename extension
     ext = "encrypted"
 
     # get memory dump
-    if(test_mode):
+    if(mode=="test"):
         dump_path = dump
+    elif(mode == "key"):
+        dump_path = True
     else:
         dump_path = get_medusa_dump()
 
-    if(dump_path):
+    if(bool(dump_path)):
         pass
     else:
         raise EnvironmentError("Failed to dump medusa process")
 
     # search AES key from memory dump
-    _256bitAESkeys = get_aes_key(dump_path, 256)
+    if(mode == "key"):
+        _256bitAESkeys = [key]
+    else:
+        _256bitAESkeys = get_aes_key(dump_path, 256)
 
     # check whether _256bitAESkeys is valid with file byte_base entropy
     is_key_valid = False
@@ -65,7 +70,7 @@ def medusa_unlocker(test_mode=False, dump=None, input_file=None):
         ent_sum = 0.0
         ave_ent = 0.0
 
-        if(test_mode):
+        if(mode):
             print(input_file)
             with open(unlock(key, input_file), "rb") as f:
                 sample = f.read()
@@ -97,7 +102,7 @@ def medusa_unlocker(test_mode=False, dump=None, input_file=None):
         raise EnvironmentError("not found valid key from memory")
 
     # decrypt all files with found valid key
-    if(test_mode):
+    if(mode):
         pass
     else:
         for file in scan_crypted_file(ext=ext):
@@ -117,8 +122,14 @@ if __name__ == "__main__":
         print("medusa_unlocker.py test memory.dump encrypted_file_path : scan aes key from dump and decrypt file.")
 
     elif(sys.argv[1] == "test" and sys.argv[2] and sys.argv[3]):
-        medusa_unlocker(True, os.path.abspath(
-            sys.argv[2]), os.path.abspath(sys.argv[3]))
+        print("test mode")
+        medusa_unlocker(mode = "test",dump= os.path.abspath(
+            sys.argv[2]),input_file= os.path.abspath(sys.argv[3]))
+
+    elif(sys.argv[1] == "key" and sys.argv[2] and sys.argv[3]):
+        print("key mode")
+        medusa_unlocker(mode = "key", input_file = os.path.abspath(
+            sys.argv[2]), key = sys.argv[3])
 
     else:
         pass
